@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button"
+
 const Home = () => {
   return (
     <div className="flex">
@@ -5,6 +7,7 @@ const Home = () => {
       <div className="mb-4 text-4xl font-bold">
         Bem-vindo ao sistema de gestão clínica
       </div>
+      <Button>Entrar</Button>
     </div>
   )
 }
