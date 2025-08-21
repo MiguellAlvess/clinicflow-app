@@ -74,6 +74,7 @@ interface UpsertDoctorFormProps {
 
 const UpsertDoctorForm = ({ doctor, onSuccess }: UpsertDoctorFormProps) => {
   const form = useForm<z.infer<typeof doctorSchema>>({
+    shouldUnregister: true,
     resolver: zodResolver(doctorSchema),
     defaultValues: {
       name: doctor?.name ?? "",
