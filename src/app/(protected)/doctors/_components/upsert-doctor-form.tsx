@@ -382,7 +382,10 @@ const UpsertDoctorForm = ({ doctor, onSuccess }: UpsertDoctorFormProps) => {
             )}
           />
           <DialogFooter>
-            <Button className="w-full" disabled={upsertDoctorAction.isPending}>
+            <Button
+              disabled={upsertDoctorAction.isPending}
+              className={doctor ? "" : "w-full"}
+            >
               {upsertDoctorAction.isPending && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}

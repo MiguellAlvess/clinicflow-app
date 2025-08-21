@@ -1,8 +1,22 @@
 "use client"
 
 import { CalendarIcon, ClockIcon, DollarSignIcon } from "lucide-react"
+import { useAction } from "next-safe-action/hooks"
 import { useState } from "react"
+import { toast } from "sonner"
 
+import { deleteDoctor } from "@/actions/delete-doctor/delete-doctor"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -26,6 +40,22 @@ const DoctorsCard = ({ doctor }: DoctorsCardProps) => {
     .map((name) => name[0])
     .join("")
   const availability = getAvailability(doctor)
+  const deleteDoctorAction = useAction(deleteDoctor, {
+    onSuccess: () => {
+      toast.success("Médico excluido com sucesso")
+    },
+    onError: (error) => {
+      console.error(error)
+      toast.error("Ocorreu um erro ao excluir o médico")
+    },
+  })
+
+  const handleDeleteDoctorClick = () => {
+    if (!doctor) return
+    deleteDoctorAction.execute({
+      id: doctor.id,
+    })
+  }
   return (
     <Card>
       <CardHeader>
@@ -58,10 +88,34 @@ const DoctorsCard = ({ doctor }: DoctorsCardProps) => {
         </Badge>
       </CardContent>
       <Separator />
-      <CardFooter>
+      <CardFooter className="flex gap-2">
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="outline" className="flex-1">
+              Deletetar médico
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent className="space-y-3">
+            <AlertDialogHeader className="flex items-center justify-center">
+              <AlertDialogTitle>Você tem certeza disso?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Ao deletar, os dados do médico serão perdidos permanentemente
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex gap-2">
+              <AlertDialogCancel className="flex-1">Cancelar</AlertDialogCancel>
+              <AlertDialogAction
+                className="flex-1"
+                onClick={handleDeleteDoctorClick}
+              >
+                Continuar
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
-            <Button className="w-full">Ver detalhes</Button>
+            <Button className="flex-1">Ver detalhes</Button>
           </DialogTrigger>
           <UpsertDoctorForm
             onSuccess={() => setIsOpen(false)}
