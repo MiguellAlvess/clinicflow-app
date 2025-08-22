@@ -124,6 +124,7 @@ const DoctorsCard = ({ doctor }: DoctorsCardProps) => {
               availableFromTime: availability.from.format("HH:mm:ss"),
               availableToTime: availability.to.format("HH:mm:ss"),
             }}
+            isOpen={isOpen}
           />
         </Dialog>
       </CardFooter>
