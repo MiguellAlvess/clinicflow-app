@@ -1,6 +1,22 @@
-import { EditIcon, MoreVerticalIcon, TrashIcon } from "lucide-react"
-import { useState } from "react"
+"use client"
 
+import { Edit, MoreVertical, Trash2 } from "lucide-react"
+import { useAction } from "next-safe-action/hooks"
+import { useState } from "react"
+import { toast } from "sonner"
+
+import { deletePatient } from "@/actions/delete-patient/delete-patient"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { Dialog } from "@/components/ui/dialog"
 import {
@@ -15,37 +31,81 @@ import { patientsTable } from "@/db/schema"
 
 import UpsertPatientForm from "./upsert-patient-form"
 
-interface PatientTableActionsProps {
-  patient?: typeof patientsTable.$inferSelect
+type Patient = typeof patientsTable.$inferSelect
+
+interface PatientsTableActionsProps {
+  patient: Patient
 }
 
-const PatientsTableActions = ({ patient }: PatientTableActionsProps) => {
-  const [isOpen, setIsOpen] = useState(false)
+const PatientsTableActions = ({ patient }: PatientsTableActionsProps) => {
+  const [isEditOpen, setIsEditOpen] = useState(false)
+
+  const deletePatientAction = useAction(deletePatient, {
+    onSuccess: () => {
+      toast.success("Paciente excluído com sucesso")
+    },
+    onError: (error) => {
+      console.error(error)
+      toast.error("Ocorreu um erro ao excluir o paciente")
+    },
+  })
+
+  const handleDeletePatientClick = () => {
+    if (!patient) return
+    deletePatientAction.execute({
+      id: patient.id,
+    })
+  }
+
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
       <DropdownMenu>
-        <DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon">
-            <MoreVerticalIcon className="m h-4 w-4" />
+            <MoreVertical className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuLabel>{patient?.name}</DropdownMenuLabel>
+          <DropdownMenuLabel>{patient.name}</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setIsOpen(true)}>
-            <EditIcon className="mr-2 h-4 w-4" />
+          <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
+            <Edit className="mr-2 h-4 w-4" />
             Editar
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <TrashIcon className="mr-2 h-4 w-4" />
-            Excluir
-          </DropdownMenuItem>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <Trash2 className="mr-2 h-4 w-4" />
+                Excluir
+              </DropdownMenuItem>
+            </AlertDialogTrigger>
+            <AlertDialogContent className="space-y-3">
+              <AlertDialogHeader className="flex items-center justify-center">
+                <AlertDialogTitle>Você tem certeza disso?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Ao deletar, os dados do paciente serão perdidos
+                  permanentemente
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="flex gap-2">
+                <AlertDialogCancel className="flex-1">
+                  Cancelar
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  className="flex-1"
+                  onClick={handleDeletePatientClick}
+                >
+                  Continuar
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </DropdownMenuContent>
       </DropdownMenu>
       <UpsertPatientForm
         patient={patient}
-        isOpen={isOpen}
-        onSuccess={() => setIsOpen(false)}
+        onSuccess={() => setIsEditOpen(false)}
+        isOpen={isEditOpen}
       />
     </Dialog>
   )
