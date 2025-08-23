@@ -1,8 +1,10 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useQuery } from "@tanstack/react-query"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
+import dayjs from "dayjs"
 import { CalendarIcon } from "lucide-react"
 import { useAction } from "next-safe-action/hooks"
 import { useEffect, useState } from "react"
@@ -12,6 +14,7 @@ import { toast } from "sonner"
 import { z } from "zod"
 
 import { createAppointment } from "@/actions/create-appointment/create-appointment"
+import { getAvailableTimes } from "@/actions/get-available-times/get-available-times"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -67,7 +70,6 @@ const CreateAppointmentForm = ({
   onSuccess,
   isOpen,
 }: CreateAppointmentFormProps) => {
-  const [date, setDate] = useState<Date>()
   const [selectedDoctor, setSelectedDoctor] = useState<string>("")
 
   const form = useForm<z.infer<typeof appointmentSchema>>({
@@ -82,6 +84,34 @@ const CreateAppointmentForm = ({
     },
   })
 
+  const selectedDoctorId = form.watch("doctorId")
+  const selectedPatientId = form.watch("patientId")
+  const selectedDate = form.watch("date")
+
+  const isFormDisabled = !selectedPatientId || !selectedDoctorId
+
+  const {
+    data: availableTimes,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["available-times", selectedDate, selectedDoctorId],
+    queryFn: () =>
+      getAvailableTimes({
+        date: dayjs(selectedDate).format("YYYY-MM-DD"),
+        doctorId: selectedDoctorId,
+      }),
+    enabled: !!selectedDate && !!selectedDoctorId,
+  })
+
+  console.log("Available times query:", {
+    availableTimes,
+    isLoading,
+    error,
+    selectedDate,
+    selectedDoctorId,
+  })
+
   useEffect(() => {
     if (isOpen) {
       form.reset({
@@ -91,7 +121,6 @@ const CreateAppointmentForm = ({
         date: undefined,
         time: "",
       })
-      setDate(undefined)
       setSelectedDoctor("")
     }
   }, [isOpen, form])
@@ -128,8 +157,6 @@ const CreateAppointmentForm = ({
       appointmentPrice: values.appointmentPrice,
     })
   }
-
-  const isFormDisabled = !form.watch("patientId") || !form.watch("doctorId")
 
   return (
     <DialogContent className="max-w-md">
@@ -237,13 +264,13 @@ const CreateAppointmentForm = ({
                     <FormControl>
                       <Button
                         variant="outline"
-                        data-empty={!date}
+                        data-empty={!selectedDate}
                         className="data-[empty=true]:text-muted-foreground w-full justify-start text-left font-normal"
                         disabled={isFormDisabled}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {date ? (
-                          format(date, "PPP", { locale: ptBR })
+                        {selectedDate ? (
+                          format(selectedDate, "PPP", { locale: ptBR })
                         ) : (
                           <span>Selecione uma data</span>
                         )}
@@ -253,9 +280,8 @@ const CreateAppointmentForm = ({
                   <PopoverContent className="w-auto p-0">
                     <Calendar
                       mode="single"
-                      selected={date}
+                      selected={selectedDate}
                       onSelect={(newDate) => {
-                        setDate(newDate)
                         field.onChange(newDate)
                       }}
                       disabled={(date) => date < new Date()}
@@ -277,7 +303,7 @@ const CreateAppointmentForm = ({
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
-                  disabled={isFormDisabled}
+                  disabled={isFormDisabled || !selectedDate}
                 >
                   <FormControl>
                     <SelectTrigger className="w-full">
@@ -285,22 +311,21 @@ const CreateAppointmentForm = ({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="08:00:00">08:00</SelectItem>
-                    <SelectItem value="08:30:00">08:30</SelectItem>
-                    <SelectItem value="09:00:00">09:00</SelectItem>
-                    <SelectItem value="09:30:00">09:30</SelectItem>
-                    <SelectItem value="10:00:00">10:00</SelectItem>
-                    <SelectItem value="10:30:00">10:30</SelectItem>
-                    <SelectItem value="11:00:00">11:00</SelectItem>
-                    <SelectItem value="11:30:00">11:30</SelectItem>
-                    <SelectItem value="14:00:00">14:00</SelectItem>
-                    <SelectItem value="14:30:00">14:30</SelectItem>
-                    <SelectItem value="15:00:00">15:00</SelectItem>
-                    <SelectItem value="15:30:00">15:30</SelectItem>
-                    <SelectItem value="16:00:00">16:00</SelectItem>
-                    <SelectItem value="16:30:00">16:30</SelectItem>
-                    <SelectItem value="17:00:00">17:00</SelectItem>
-                    <SelectItem value="17:30:00">17:30</SelectItem>
+                    {availableTimes?.data && availableTimes.data.length > 0 ? (
+                      availableTimes.data.map((time) => (
+                        <SelectItem
+                          key={time.value}
+                          value={time.value}
+                          disabled={!time.available}
+                        >
+                          {time.label} {!time.available && "(Indisponível)"}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="no-times" disabled>
+                        Nenhum horário disponível
+                      </SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
                 <FormMessage />
