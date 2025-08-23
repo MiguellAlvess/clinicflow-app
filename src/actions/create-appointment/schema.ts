@@ -7,4 +7,5 @@ export const createAppointmentSchema = z.object({
     message: "O valor da consulta é obrigatório",
   }),
   date: z.date({ message: "A data é obrigatória" }),
+  time: z.string(),
 })
