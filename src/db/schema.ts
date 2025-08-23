@@ -174,6 +174,7 @@ export const patientsTableRelations = relations(
 
 export const appointmentsTable = pgTable("appointments", {
   id: uuid("id").defaultRandom().primaryKey(),
+  appointmentPriceInCents: integer("appointment_price_in_cents").notNull(),
   date: timestamp("date").notNull(),
   doctorId: uuid("doctor_id")
     .notNull()
