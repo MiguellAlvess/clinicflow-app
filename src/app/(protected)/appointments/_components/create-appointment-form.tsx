@@ -158,6 +158,19 @@ const CreateAppointmentForm = ({
     })
   }
 
+  const isDateAvailable = (date: Date) => {
+    if (!selectedDoctorId) return false
+    const selectedDoctor = doctors.find(
+      (doctor) => doctor.id === selectedDoctorId,
+    )
+    if (!selectedDoctor) return false
+    const dayOfWeek = date.getDay()
+    return (
+      dayOfWeek >= selectedDoctor?.availableFromWeekDay &&
+      dayOfWeek <= selectedDoctor?.availableToWeekDay
+    )
+  }
+
   return (
     <DialogContent className="max-w-md">
       <DialogHeader className="flex items-center justify-center">
@@ -284,7 +297,9 @@ const CreateAppointmentForm = ({
                       onSelect={(newDate) => {
                         field.onChange(newDate)
                       }}
-                      disabled={(date) => date < new Date()}
+                      disabled={(date) =>
+                        date < new Date() || !isDateAvailable(date)
+                      }
                       locale={ptBR}
                     />
                   </PopoverContent>
