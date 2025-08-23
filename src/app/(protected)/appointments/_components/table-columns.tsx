@@ -31,17 +31,22 @@ export const appointmentsTableColumns: ColumnDef<Appointment>[] = [
     header: "Médico",
     cell: ({ row }) => {
       const appointment = row.original
-      return `${appointment.doctor.name} - ${appointment.doctor.specialty}`
+      return `${appointment.doctor.name}`
     },
   },
   {
     id: "date",
     accessorKey: "date",
-    header: "Data e Hora",
+    header: "Data e hora",
     cell: ({ row }) => {
       const date = row.original.date
       return format(new Date(date), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })
     },
+  },
+  {
+    id: "specialty",
+    accessorKey: "doctor.specialty",
+    header: "Especialidade",
   },
   {
     id: "appointmentPriceInCents",

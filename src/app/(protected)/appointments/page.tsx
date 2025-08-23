@@ -1,6 +1,7 @@
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 
+import { DataTable } from "@/components/ui/data-table"
 import {
   PageActions,
   PageContainer,
@@ -10,11 +11,13 @@ import {
   PageHeaderContent,
   PageTitle,
 } from "@/components/ui/page-container"
+import { getAppointments } from "@/data/appointment/get-appointments"
 import { getDoctors } from "@/data/doctor/get-doctors"
 import { getPatients } from "@/data/patient/get-patients"
 import { auth } from "@/lib/auth"
 
-import AddAppointmentButton from "./_components/add-appointment-button"
+import CreateAppointmentButton from "./_components/create-appointment-button"
+import { appointmentsTableColumns } from "./_components/table-columns"
 
 const AppointmentsPage = async () => {
   const session = await auth.api.getSession({
@@ -27,7 +30,11 @@ const AppointmentsPage = async () => {
     redirect("/clinic-form")
   }
 
-  const [patients, doctors] = await Promise.all([getPatients(), getDoctors()])
+  const [patients, doctors, appointments] = await Promise.all([
+    getPatients(),
+    getDoctors(),
+    getAppointments(),
+  ])
 
   return (
     <PageContainer>
@@ -39,13 +46,11 @@ const AppointmentsPage = async () => {
           </PageDescription>
         </PageHeaderContent>
         <PageActions>
-          <AddAppointmentButton patients={patients} doctors={doctors} />
+          <CreateAppointmentButton patients={patients} doctors={doctors} />
         </PageActions>
       </PageHeader>
       <PageContent>
-        <div className="text-muted-foreground text-center">
-          <p>Lista de agendamentos será implementada em breve.</p>
-        </div>
+        <DataTable data={appointments} columns={appointmentsTableColumns} />
       </PageContent>
     </PageContainer>
   )
