@@ -1,6 +1,7 @@
 "use client"
 
 import dayjs from "dayjs"
+import { CircleDollarSign } from "lucide-react"
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -55,6 +56,7 @@ export function RevenueChart({ dailyAppointmentsData }: RevenueChartProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center gap-2">
+        <CircleDollarSign />
         <CardTitle className="text-xl font-semibold">
           Agendamentos e Faturamento
         </CardTitle>
