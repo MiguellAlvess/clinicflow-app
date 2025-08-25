@@ -51,4 +51,5 @@ export const createAppointment = actionClient
     await db.insert(appointmentsTable).values(appointmentData)
 
     revalidatePath("/appointments")
+    revalidatePath("/dashboard")
   })
