@@ -19,6 +19,7 @@ import { auth } from "@/lib/auth"
 import { DatePicker } from "./_components/date-picker"
 import { RevenueChart } from "./_components/revenue-chart"
 import StatsCards from "./_components/stats-cards"
+import TodayAppointmentsTable from "./_components/today-appointments-table"
 import TopDoctorsList from "./_components/top-doctors-list"
 import TopSpecialtiesList from "./_components/top-specialties"
 
@@ -53,6 +54,7 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
     [totalDoctors],
     topDoctors,
     topSpecialties,
+    todayAppointments,
   ] = await Promise.all([
     db
       .select({
@@ -127,6 +129,17 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
       )
       .groupBy(doctorsTable.specialty)
       .orderBy(desc(count(appointmentsTable.id))),
+    db.query.appointmentsTable.findMany({
+      where: and(
+        eq(appointmentsTable.clinicId, session.user.clinic.id),
+        gte(appointmentsTable.date, new Date()),
+        lte(appointmentsTable.date, new Date()),
+      ),
+      with: {
+        patient: true,
+        doctor: true,
+      },
+    }),
   ])
 
   const chartStartDate = dayjs().subtract(10, "days").startOf("day").toDate()
@@ -175,6 +188,7 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
           <TopDoctorsList doctors={topDoctors} />
         </div>
         <div className="grid grid-cols-[2.25fr_1fr] gap-5">
+          <TodayAppointmentsTable todayAppointments={todayAppointments} />
           <TopSpecialtiesList topSpecialties={topSpecialties} />
         </div>
       </PageContent>
