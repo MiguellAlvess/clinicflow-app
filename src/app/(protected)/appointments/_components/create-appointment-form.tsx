@@ -155,6 +155,7 @@ const CreateAppointmentForm = ({
       doctorId: values.doctorId,
       date: dateTime,
       appointmentPrice: values.appointmentPrice,
+      time: values.time,
     })
   }
 
