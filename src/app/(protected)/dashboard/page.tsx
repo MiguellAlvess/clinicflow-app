@@ -20,6 +20,7 @@ import { DatePicker } from "./_components/date-picker"
 import { RevenueChart } from "./_components/revenue-chart"
 import StatsCards from "./_components/stats-cards"
 import TopDoctorsList from "./_components/top-doctors-list"
+import TopSpecialtiesList from "./_components/top-specialties"
 
 interface DashboardPageProps {
   searchParams: Promise<{
@@ -51,6 +52,7 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
     [totalPatients],
     [totalDoctors],
     topDoctors,
+    topSpecialties,
   ] = await Promise.all([
     db
       .select({
@@ -109,6 +111,22 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
       .groupBy(doctorsTable.id)
       .orderBy(desc(count(appointmentsTable.id)))
       .limit(10),
+    db
+      .select({
+        specialty: doctorsTable.specialty,
+        appointments: count(appointmentsTable.id),
+      })
+      .from(appointmentsTable)
+      .innerJoin(doctorsTable, eq(appointmentsTable.doctorId, doctorsTable.id))
+      .where(
+        and(
+          eq(appointmentsTable.clinicId, session.user.clinic.id),
+          gte(appointmentsTable.date, new Date(from)),
+          lte(appointmentsTable.date, new Date(to)),
+        ),
+      )
+      .groupBy(doctorsTable.specialty)
+      .orderBy(desc(count(appointmentsTable.id))),
   ])
 
   const chartStartDate = dayjs().subtract(10, "days").startOf("day").toDate()
@@ -155,6 +173,9 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
         <div className="grid grid-cols-[2.5fr_1fr] gap-5">
           <RevenueChart dailyAppointmentsData={dailyAppointmentsData} />
           <TopDoctorsList doctors={topDoctors} />
+        </div>
+        <div className="grid grid-cols-[2.25fr_1fr] gap-5">
+          <TopSpecialtiesList topSpecialties={topSpecialties} />
         </div>
       </PageContent>
     </PageContainer>
