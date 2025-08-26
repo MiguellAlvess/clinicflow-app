@@ -1,6 +1,6 @@
 "use client"
 
-// import { loadStripe } from "@stripe/stripe-js"
+import { loadStripe } from "@stripe/stripe-js"
 import { Badge, CheckCircle2, Loader2 } from "lucide-react"
 import { useAction } from "next-safe-action/hooks"
 
@@ -15,14 +15,23 @@ interface SubscriptionPlanProps {
 
 const SubscriptionPlan = ({ active, className }: SubscriptionPlanProps) => {
   const createStripeCheckoutAction = useAction(createStripeCheckout, {
-    // onSuccess: (data) => {
-    //   if (!process.env.NEXT_PUBLIC_STRIP_PUBLISHABLE_KEY) {
-    //     throw new Error("Stripe publishable key not found")
-    //   }
-    //   const stripe = await loadStripe(
-    //     process.env.NEXT_PUBLIC_STRIP_PUBLISHABLE_KEY,
-    //   )
-    // },
+    onSuccess: async ({ data }) => {
+      if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
+        throw new Error("Stripe publishable key not found")
+      }
+      const stripe = await loadStripe(
+        process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+      )
+      if (!stripe) {
+        throw new Error("Stripe not found")
+      }
+      if (!data?.sessionId) {
+        throw new Error("Session id not found")
+      }
+      await stripe.redirectToCheckout({
+        sessionId: data.sessionId,
+      })
+    },
   })
   const features = [
     "Cadastro de até 3 médicos",
@@ -73,14 +82,14 @@ const SubscriptionPlan = ({ active, className }: SubscriptionPlanProps) => {
             className="w-full"
             variant="outline"
             onClick={active ? () => {} : handleSubscribeClick}
+            disabled={createStripeCheckoutAction.isExecuting}
           >
-            {active ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Carregando...
-              </>
+            {createStripeCheckoutAction.isExecuting ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
-              "Assine agora"
+              <span>
+                {active ? "Gerenciar assinatura" : "Fazer assinatura"}
+              </span>
             )}
           </Button>
         </div>
