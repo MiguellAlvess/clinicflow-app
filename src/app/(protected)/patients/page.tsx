@@ -27,6 +27,9 @@ const PatientsPage = async () => {
   if (!session.user.clinic) {
     redirect("/clinic-form")
   }
+  if (!session?.user.plan) {
+    redirect("/new-subscription")
+  }
   const patients = await getPatients()
 
   return (
