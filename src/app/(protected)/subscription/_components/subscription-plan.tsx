@@ -1,19 +1,27 @@
 "use client"
 
 import { loadStripe } from "@stripe/stripe-js"
-import { Badge, CheckCircle2, Loader2 } from "lucide-react"
+import { CheckCircle2, Loader2 } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { useAction } from "next-safe-action/hooks"
 
 import { createStripeCheckout } from "@/actions/create-stripe-checkout/create-stripe-checkout"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 
 interface SubscriptionPlanProps {
   active?: boolean
   className?: string
+  userEmail: string
 }
 
-const SubscriptionPlan = ({ active, className }: SubscriptionPlanProps) => {
+const SubscriptionPlan = ({
+  active,
+  className,
+  userEmail,
+}: SubscriptionPlanProps) => {
+  const router = useRouter()
   const createStripeCheckoutAction = useAction(createStripeCheckout, {
     onSuccess: async ({ data }) => {
       if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
@@ -34,16 +42,21 @@ const SubscriptionPlan = ({ active, className }: SubscriptionPlanProps) => {
     },
   })
   const features = [
-    "Cadastro de até 3 médicos",
+    "Médicos ilimitados",
+    "Pacientes ilimitados",
     "Agendamentos ilimitados",
     "Métricas básicas",
     "Cadastro de pacientes",
     "Confirmação manual",
-    "Suporte via e-mail",
   ]
 
   const handleSubscribeClick = () => {
     createStripeCheckoutAction.execute()
+  }
+  const handleManagePlanClick = () => {
+    router.push(
+      `${process.env.NEXT_PUBLIC_STRIPE_CUSTOMER_PORTAL_URL}?prefilled_email=${userEmail}`,
+    )
   }
   return (
     <Card className={className}>
@@ -81,7 +94,7 @@ const SubscriptionPlan = ({ active, className }: SubscriptionPlanProps) => {
           <Button
             className="w-full"
             variant="outline"
-            onClick={active ? () => {} : handleSubscribeClick}
+            onClick={active ? handleManagePlanClick : handleSubscribeClick}
             disabled={createStripeCheckoutAction.isExecuting}
           >
             {createStripeCheckoutAction.isExecuting ? (
