@@ -1,36 +1,98 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ClinicFlow
 
-## Getting Started
+Aplicação web full stack para gestão de clínicas e consultórios, permitindo o cadastro de médicos e pacientes, o agendamento e acompanhamento de consultas, o gerenciamento de pagamentos e informações financeiras, além de um dashboard para visualizar métricas e acompanhar o desempenho da clínica.
 
-First, run the development server:
+## Configuração do Ambiente
+
+Para executar o projeto em seu ambiente de desenvolvimento, siga as instruções abaixo:
+
+**Instale as dependências:**
+
+```bash
+npm install
+# ou
+yarn install
+# ou
+pnpm install
+```
+
+**Configure as variáveis de ambiente:**
+
+- Crie um arquivo `.env` na raiz do projeto, com base no arquivo `.env.example`.
+- Preencha as variáveis de ambiente com os valores corretos para o seu ambiente. Exemplo:
+
+```
+DATABASE_URL="<URL_DO_SEU_BANCO_DE_DADOS>"
+BETTER_AUTH_SECRET="<UM_SEGREDO_ALEATORIO_E_SEGURO>"
+BETTER_AUTH_URL="http://localhost:3000" # Ou o URL do seu ambiente
+GOOGLE_CLIENT_ID="<ID_DO_CLIENTE_GOOGLE>"
+GOOGLE_CLIENT_SECRET="<SEGREDO_DO_CLIENTE_GOOGLE>"
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="<CHAVE_PUBLICA_DO_STRIPE>"
+STRIPE_SECRET_KEY="<CHAVE_SECRETA_DO_STRIPE>"
+STRIPE_PREMIUM_PLAN_PRICE_ID="<PRICE_ID_DO_PLANO_PREMIUM_NO_STRIPE>"
+STRIPE_WEBHOOK_SECRET="<SEGREDO_DO_WEBHOOK_DO_STRIPE>"
+NEXT_PUBLIC_APP_URL="http://localhost:3000" # Ou o URL do seu ambiente
+NEXT_PUBLIC_STRIPE_CUSTOMER_PORTAL_URL="<URL_DO_PORTAL_DO_CLIENTE_NO_STRIPE>"
+STRIPE_PUBLIC_KEY="<CHAVE_PUBLICA_DO_STRIPE>"
+```
+
+**Execute as migrações do Drizzle :**
+
+```bash
+npx drizzle-kit push
+```
+
+**Inicie o ambiente de desenvolvimento:**
+
+Sem docker
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Com Docker:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+docker-compose up -d
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+npm run dev
+```
 
-## Learn More
+## Funcionalidades
 
-To learn more about Next.js, take a look at the following resources:
+- **Planos de assinatura**
+- **Autenticação segura**
+- **Agendamento de consultas:**
+- **Gestão de pacientes**
+- **Gestão de médicos**
+- **Dashboard com métricas da clínica**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Principais Tecnologias
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Next.js:**
+- **Tailwind CSS:**
+- **TypeScript:**
+- **Better Auth:**
+- **Stripe:**
+- **Docker:**
+- **Drizzle ORM:**
+- **PostgreSQL:**
 
-## Deploy on Vercel
+## Autenticação
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+A autenticação é realizada através do Better Auth, que oferece uma experiência de login segura e personalizável. Os usuários podem se autenticar utilizando:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Email e senha:** método tradicional de autenticação, com validação de email e recuperação de senha.
+- **Conta Google:** autenticação social através do Google, permitindo que os usuários acessem a plataforma com suas contas Google existentes.
+
+## Stripe
+
+Integração com Stripe para processamento de pagamentos de planos de assinatura.
+
+## Deploy
+
+Deploy realizado na Vercel.
+
+## Visualização
+
+Veja abaixo alguns prints das interfaces do projeto em funcionamento.
