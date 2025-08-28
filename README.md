@@ -96,3 +96,17 @@ Deploy realizado na Vercel.
 ## Visualização
 
 Veja abaixo alguns prints das interfaces do projeto em funcionamento.
+
+<img width="1896" height="907" alt="clinicflow-home-page" src="https://github.com/user-attachments/assets/a2d118bb-a15f-462b-b686-7a4cdb6e34ed" />
+
+<img width="1912" height="905" alt="clinicflow-appointments-page" src="https://github.com/user-attachments/assets/31e2b05e-9a23-4b29-8659-25fa5ae1bac3" />
+
+<img width="1897" height="905" alt="clinicflow-doctors-page" src="https://github.com/user-attachments/assets/12cb7b00-803b-4cbd-a738-4e49c569f247" />
+
+<img width="1892" height="903" alt="clinicflow-patients-page" src="https://github.com/user-attachments/assets/3fb1d1f0-8d7e-43b9-a80a-e87a392d2389" />
+
+<img width="1912" height="900" alt="clinicflow-subscription-page" src="https://github.com/user-attachments/assets/2e9adc6b-d7c8-4a8c-92cc-8495767cff5f" />
+
+
+
+
