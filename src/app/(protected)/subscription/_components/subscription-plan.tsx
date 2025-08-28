@@ -45,9 +45,8 @@ const SubscriptionPlan = ({
     "Médicos ilimitados",
     "Pacientes ilimitados",
     "Agendamentos ilimitados",
-    "Métricas básicas",
-    "Cadastro de pacientes",
-    "Confirmação manual",
+    "Dashboard com métricas",
+    "Suporte via email",
   ]
 
   const handleSubscribeClick = () => {
